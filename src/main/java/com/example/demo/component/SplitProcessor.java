@@ -1,10 +1,13 @@
 package com.example.demo.component;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
@@ -29,11 +32,11 @@ public class SplitProcessor implements Processor {
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		String fileName = (String) exchange.getIn().getHeader("CamelFileName");
-		String xmlString = (String) exchange.getIn().getBody();
+		String xmlString = (String) exchange.getIn().getBody(String.class);
 		
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = builderFactory.newDocumentBuilder();
-		Document xmlDocument = builder.parse(xmlString);
+		Document xmlDocument = builder.parse(new ByteArrayInputStream(xmlString.getBytes(StandardCharsets.UTF_8)));
 		XPath xPath = XPathFactory.newInstance().newXPath();
 		SimpleNamespaceContext nsc = new SimpleNamespaceContext();
 		nsc.bindDefaultNamespaceUri("http://www.visa.com/ROLSI");
@@ -42,7 +45,7 @@ public class SplitProcessor implements Processor {
 		WorkflowEvent event = new WorkflowEvent();
 		event.setId(UUID.randomUUID());
 		event.setEventDate(new Date());
-		event.setEventType(fileName = " contains " + (Long) recount + " records");
+		event.setEventType(fileName + " contains " + (Double) recount + " records");
 		event.setFileName(fileName);
 		service.save(event);
 	}
