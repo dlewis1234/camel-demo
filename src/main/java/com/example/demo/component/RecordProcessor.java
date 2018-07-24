@@ -31,6 +31,7 @@ public class RecordProcessor implements Processor {
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
+		String fileName = (String) exchange.getIn().getHeader("CamelFileName");
 		String xmlString = (String) exchange.getIn().getBody(String.class);
 		
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -44,6 +45,7 @@ public class RecordProcessor implements Processor {
 		WorkflowEvent event = new WorkflowEvent();
 		event.setId(UUID.randomUUID());
 		event.setEventDate(new Date());
+		event.setFileName(fileName);
 		event.setEventType("Processing record");
 		event.setRecordId(node.getTextContent());
 		service.save(event);

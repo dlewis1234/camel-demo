@@ -39,15 +39,15 @@ public class CamelRoutes extends RouteBuilder {
 		ZipFileDataFormat zf = new ZipFileDataFormat();
 		zf.setUsingIterator(true);
 
-		from("file:" + filePath + "/sftp")
+		from("file:" + filePath + "/sftp?move=.camel/${date:now:yyyy-MM-dd}/${header.CamelFileName}")
 			.id("sftpFiles").process(sftpProcessor).unmarshal(zf).split(bodyAs(Iterator.class)).streaming()
 				.to("file:" + filePath + "/zip");
 		
-		from("file:" + filePath +"/zip/?antInclude=**/DDM*")
+		from("file:" + filePath +"/zip/?antInclude=**/DDM*&move=.camel/${date:now:yyyy-MM-dd}/${header.CamelFileName}")
 			.id("unzipDataFiles").process(dataProcessor).unmarshal(zf).split(bodyAs(Iterator.class)).streaming()
 			.to("file:" + filePath + "/unzip");
 		
-		from("file:" + filePath +"/zip/?antInclude=**/BDM*,**/RDM*")
+		from("file:" + filePath +"/zip/?antInclude=**/BDM*,**/RDM*&move=.camel/${date:now:yyyy-MM-dd}/${header.CamelFileName}")
 			.id("verifyFile").doTry().process(validationProcessor).to("direct:splitFile").doCatch(Exception.class).doFinally().end();
 		
 		from("direct:splitFile")
