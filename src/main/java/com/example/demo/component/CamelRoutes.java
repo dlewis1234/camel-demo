@@ -41,21 +41,21 @@ public class CamelRoutes extends RouteBuilder {
 
 		from("file:" + filePath + "/sftp?move=.camel/${date:now:yyyy-MM-dd}/${header.CamelFileName}")
 			.id("sftpFiles").process(sftpProcessor).unmarshal(zf).split(bodyAs(Iterator.class)).streaming()
-				.to("file:" + filePath + "/zip");
+				.to("file:" + filePath + "/zip").log("Retrieving file ${file:name}");
 		
 		from("file:" + filePath +"/zip/?antInclude=**/DDM*&move=.camel/${date:now:yyyy-MM-dd}/${header.CamelFileName}")
 			.id("unzipDataFiles").process(dataProcessor).unmarshal(zf).split(bodyAs(Iterator.class)).streaming()
-			.to("file:" + filePath + "/unzip");
+			.to("file:" + filePath + "/unzip").log("Unzipping file ${file:name}");
 		
 		from("file:" + filePath +"/zip/?antInclude=**/BDM*,**/RDM*&move=.camel/${date:now:yyyy-MM-dd}/${header.CamelFileName}")
-			.id("verifyFile").doTry().process(validationProcessor).to("direct:splitFile").doCatch(Exception.class).doFinally().end();
+			.id("verifyFile").doTry().process(validationProcessor).to("direct:splitFile").log("Validation succeeded for ${file:name}").doCatch(Exception.class).log("Validation failed for ${file:name}").doFinally().end();
 		
 		from("direct:splitFile")
 			.id("splitFile").process(splitProcessor).split(xpath("//n:Case").namespace("n","http://www.visa.com/ROLSI"))
-			.to("direct:processRecord");
+			.to("direct:processRecord").log("Splitting file ${file:name}");
 		
 		from("direct:processRecord")
-			.id("processRecord").threads(5).process(recordProcessor).end();
+			.id("processRecord").threads(5).process(recordProcessor).log("Processing record ${body}").end();
 
 	}
 
