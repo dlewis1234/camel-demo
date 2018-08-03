@@ -1,35 +1,29 @@
 package com.example.demo.component;
 
-import java.util.Date;
-import java.util.UUID;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.domain.WorkflowEvent;
-import com.example.demo.repository.WorkflowEventRepository;
-import com.example.demo.service.WorkFlowEventService;
+import com.example.demo.repository.FileEventRepository;
+import com.example.demo.utils.FileEventConverter;
 
 @Component
 public class ValidationProcessor implements Processor {
 
 	@Autowired
-	WorkFlowEventService service;
+	FileEventConverter converter;
+	
+	@Autowired
+	FileEventRepository repository;
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
 		String fileName = (String) exchange.getIn().getHeader("CamelFileName");
-		WorkflowEvent event = new WorkflowEvent();
-		event.setId(UUID.randomUUID());
-		event.setEventDate(new Date());
 		if (fileName.startsWith("BDM"))
-			event.setEventType("Validation failed");
+			repository.save(converter.createFileEvent("Validation failed",exchange));
 		else
-			event.setEventType("Validation passed");
-		event.setFileName(fileName);
-		service.save(event);
+			repository.save(converter.createFileEvent("Validation passed",exchange));
 		if (fileName.startsWith("BDM"))
 			throw new Exception("Validation failed");
 	}
