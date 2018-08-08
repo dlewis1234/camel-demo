@@ -51,7 +51,7 @@ public class CamelRoutes extends RouteBuilder {
 			.id("verifyFile").doTry().process(validationProcessor).to("direct:splitFile").log("Validation succeeded for ${file:name}").doCatch(Exception.class).log("Validation failed for ${file:name}").doFinally().end();
 		
 		from("direct:splitFile")
-			.id("splitFile").process(splitProcessor).split(xpath("//n:Case").namespace("n","http://www.visa.com/ROLSI"))
+			.id("splitFile").process(splitProcessor).split(xpath("//n:CaseManifest").namespace("n","http://www.visa.com/ROLSI"))
 			.to("direct:processRecord").log("Splitting file ${file:name}");
 		
 		from("direct:processRecord")
