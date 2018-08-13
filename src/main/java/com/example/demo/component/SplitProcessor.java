@@ -5,10 +5,8 @@ import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.domain.ProcessStatusDetail;
-import com.example.demo.domain.ProcessStatusDetail.Key;
 import com.example.demo.repository.FileEventRepository;
-import com.example.demo.repository.ProcessStatusDetailRepository;
+import com.example.demo.repository.ProcessStatusRepository;
 import com.example.demo.utils.FileEventConverter;
 
 @Component
@@ -21,7 +19,7 @@ public class SplitProcessor implements Processor {
 	FileEventRepository repository;
 	
 	@Autowired
-	ProcessStatusDetailRepository processStatusDetailRepository;
+	ProcessStatusRepository processStatusRepository;
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
