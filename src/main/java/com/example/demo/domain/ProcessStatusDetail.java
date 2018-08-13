@@ -1,6 +1,8 @@
 package com.example.demo.domain;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.CassandraType;
@@ -12,6 +14,7 @@ import org.springframework.data.cassandra.core.mapping.Table;
 
 import com.datastax.driver.core.DataType.Name;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class ProcessStatusDetail {
 
 	@PrimaryKeyClass
-	@Data
+	@Data @AllArgsConstructor
 	public class Key implements Serializable {
 		@PrimaryKeyColumn(name ="file_name", ordinal=0 , type = PrimaryKeyType.PARTITIONED)
 		private String fileName;

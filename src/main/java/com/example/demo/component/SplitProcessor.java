@@ -5,7 +5,10 @@ import org.apache.camel.Processor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.example.demo.domain.ProcessStatusDetail;
+import com.example.demo.domain.ProcessStatusDetail.Key;
 import com.example.demo.repository.FileEventRepository;
+import com.example.demo.repository.ProcessStatusDetailRepository;
 import com.example.demo.utils.FileEventConverter;
 
 @Component
@@ -16,6 +19,9 @@ public class SplitProcessor implements Processor {
 	
 	@Autowired
 	FileEventRepository repository;
+	
+	@Autowired
+	ProcessStatusDetailRepository processStatusDetailRepository;
 
 	@Override
 	public void process(Exchange exchange) throws Exception {
@@ -37,7 +43,6 @@ public class SplitProcessor implements Processor {
 		event.setFileName(fileName);
 		service.save(event);*/
 		repository.save(converter.createFileEvent("Splitting Records",exchange));
-		
 	}
 
 }
